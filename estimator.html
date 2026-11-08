@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Онлайн-калькулятор сметы и выручки от слотов | ЗаБег.РФ Камчатка 2027</title>
+  <script src="xlsx.full.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Roboto+Condensed:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+      font-weight: 300;
+      color: #1e293b;
+      background-color: #f8fafc;
+    }
+    .font-condensed {
+      font-family: 'Roboto Condensed', sans-serif;
+    }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    .table-input {
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #065f46;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight: 500;
+      text-align: right;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .table-input:focus {
+      outline: none;
+      border-color: #009fe3;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 2px rgba(0, 159, 227, 0.2);
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; font-size: 10pt; }
+      .print-shadow-none { box-shadow: none !important; border: 1px solid #ccc !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- ШАПКА КАЛЬКУЛЯТОРА -->
+  <header class="bg-[#091a2b] text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-xs font-medium text-slate-200 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>В платформу ЗаБег.РФ</span>
+        </a>
+        <div class="h-5 w-px bg-slate-700 hidden sm:block"></div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs uppercase tracking-widest font-condensed font-medium text-[#009fe3]">ЗАБЕГ.РФ • КАМЧАТКА 2027</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-condensed font-medium bg-[#ff3311] text-white">22 МАЯ 2027</span>
+          </div>
+          <h1 class="text-lg sm:text-xl font-medium font-condensed uppercase tracking-tight text-white leading-tight">
+            Интерактивный онлайн-калькулятор сметы и выручки от слотов (2 000 чел.)
+          </h1>
+        </div>
+      </div>
+
+      <!-- КНОПКИ ДЕЙСТВИЙ В ШАПКЕ -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="downloadExcelFile()" class="px-3.5 py-1.5 rounded-lg bg-[#009fe3] hover:bg-[#007bb5] text-white font-condensed font-medium text-xs sm:text-sm flex items-center gap-1.5 shadow transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Экспорт в Excel (.xlsx)</span>
+        </button>
+        <a href="02_Шаблон_сметы_для_расчета_и_изменения_цен.xlsx" download class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-condensed font-medium text-xs sm:text-sm flex items-center gap-1.5 shadow transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>Шаблон Excel</span>
+        </a>
+        <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-condensed font-medium text-xs sm:text-sm flex items-center gap-1.5 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          <span>Печать</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ГЛАВНЫЙ КОНТЕНТ -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- ИНФОРМАЦИОННЫЙ БАННЕР -->
+    <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-[#009fe3]"></span>
+          <span class="font-condensed font-semibold text-sm tracking-wide text-slate-900 uppercase">ОНЛАЙН РАСЧЕТ, РЕДАКТИРОВАНИЕ И СОХРАНЕНИЕ В РЕАЛЬНОМ ВРЕМЕНИ</span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-600 font-light">
+          Вы можете изменять количество, цену, добавлять и удалять статьи расходов. Все изменения автоматически сохраняются в браузере (LocalStorage), а сметы и выручка от 2 000 слотов пересчитываются мгновенно. Выдача стартовых пакетов: <strong>ФОК «Звёздный»</strong> (20–21 мая 2027 г. с 10:00 до 20:00).
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
+        <span id="save_badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-condensed font-medium">
+          <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          LocalStorage активно
+        </span>
+      </div>
+    </div>
+
+    <!-- KPI ДАШБОРД СМЕТЫ -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3.5">
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-[11px] font-condensed font-medium text-slate-500 uppercase tracking-wider block">Смета Агранат 2027</span>
+        <div id="kpiAgranat" class="text-xl sm:text-2xl font-medium font-condensed text-slate-700 mt-1">5 008 248 ₽</div>
+        <p class="text-[11px] text-slate-500 font-light mt-0.5">Ориентир посредника</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <span class="text-[11px] font-condensed font-medium text-slate-500 uppercase tracking-wider block">Прямые расходы</span>
+        <div id="kpiDirect" class="text-xl sm:text-2xl font-medium font-condensed text-slate-900 mt-1">2 497 300 ₽</div>
+        <p class="text-[11px] text-slate-500 font-light mt-0.5">Сумма всех прямых статей</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-rose-200 bg-rose-50/30 shadow-sm">
+        <span class="text-[11px] font-condensed font-medium text-rose-800 uppercase tracking-wider block">Резерв на форс-мажор (15%)</span>
+        <div id="kpiReserve" class="text-xl sm:text-2xl font-medium font-condensed text-rose-700 mt-1">374 595 ₽</div>
+        <p class="text-[11px] text-slate-500 font-light mt-0.5">Погода, шторм, непредвиденные нужды</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border-2 border-[#009fe3] shadow-sm relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-16 h-16 bg-[#009fe3]/10 rounded-bl-full pointer-events-none"></div>
+        <span class="text-[11px] font-condensed font-semibold text-[#007bb5] uppercase tracking-wider block">ЦЕЛЕВОЙ БЮДЖЕТ (ИТОГО)</span>
+        <div id="kpiTotalWithRes" class="text-2xl sm:text-3xl font-medium font-condensed text-[#009fe3] mt-1">2 871 895 ₽</div>
+        <p class="text-[11px] text-slate-500 font-light mt-0.5">Сумма к утверждению</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl border border-emerald-200 bg-emerald-50/40 shadow-sm col-span-2 lg:col-span-1">
+        <span class="text-[11px] font-condensed font-semibold text-emerald-800 uppercase tracking-wider block">ЭКОНОМИЯ КРАЯ</span>
+        <div id="kpiSavings" class="text-2xl sm:text-3xl font-medium font-condensed text-emerald-700 mt-1">2 136 353 ₽</div>
+        <p id="kpiSavingsPct" class="text-[11px] text-emerald-800 font-medium mt-0.5">-42.7% экономии средств</p>
+      </div>
+    </div>
+
+    <!-- МОДЕЛЬ ВЫГОДЫ И ВЫРУЧКИ ОТ 2 000 СЛОТОВ -->
+    <div class="bg-gradient-to-br from-[#091a2b] via-[#0d233a] to-[#13283e] rounded-2xl p-6 text-white shadow-md border border-slate-700 space-y-5">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-slate-700">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded text-[11px] font-condensed font-semibold bg-[#009fe3] text-white uppercase tracking-wider">
+              ЭКОНОМИКА САМООКУПАЕМОСТИ
+            </span>
+            <span class="px-2 py-0.5 rounded text-[11px] font-condensed bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              2 000 УЧАСТНИКОВ
+            </span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-medium font-condensed uppercase tracking-tight text-white mt-1">
+            РАСЧЕТ ВЫРУЧКИ ОТ ПРОДАЖИ СЛОТОВ И ВЫГОДА РЕГИОНА
+          </h2>
+          <p class="text-xs text-slate-300 font-light">
+            Динамическое ценообразование: чем ближе к старту, тем дороже. Выручка КГАУ «ЦСП ПК» полностью окупает все расходы.
+          </p>
+        </div>
+
+        <!-- ТАРИФНЫЕ ПРЕСЕТЫ -->
+        <div class="flex items-center gap-2">
+          <button onclick="setSlotTariffPreset('start')" id="btn_slot_start" class="px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-[#009fe3] text-white shadow transition">
+            Старт (1500–3500 ₽)
+          </button>
+          <button onclick="setSlotTariffPreset('mid')" id="btn_slot_mid" class="px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+            Средний тариф
+          </button>
+          <button onclick="setSlotTariffPreset('final')" id="btn_slot_final" class="px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+            Финал (2000–4000 ₽)
+          </button>
+        </div>
+      </div>
+
+      <!-- ТАБЛИЦА РАСЧЕТА СЛОТОВ -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        <!-- 1 км -->
+        <div class="bg-white/5 rounded-xl p-4 border border-slate-700/60 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-condensed font-semibold text-emerald-400 text-sm">1 КМ • ДЕТСКИЙ</span>
+            <span class="text-[11px] text-slate-400">от 6 лет</span>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-300">Слотов:</span>
+            <input type="number" id="slot_q1" value="400" oninput="updateSlotModel()" class="w-20 text-right bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-condensed font-medium focus:border-[#009fe3] focus:outline-none">
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-300">Тариф за слот:</span>
+            <input type="number" id="slot_p1" value="1500" oninput="updateSlotModel()" class="w-24 text-right bg-slate-900 border border-slate-700 rounded px-2 py-1 text-emerald-400 font-condensed font-medium focus:border-[#009fe3] focus:outline-none">
+          </div>
+          <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between">
+            <span class="text-slate-400">Чистая выручка (95%):</span>
+            <span id="slot_net1" class="font-condensed font-medium text-emerald-400 text-sm">570 000 ₽</span>
+          </div>
+        </div>
+
+        <!-- 5 км -->
+        <div class="bg-white/5 rounded-xl p-4 border border-slate-700/60 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-condensed font-semibold text-sky-400 text-sm">ПСБ 5 КМ • НОВИЧКИ</span>
+            <span class="text-[11px] text-slate-400">от 16 лет</span>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-300">Слотов:</span>
+            <input type="number" id="slot_q5" value="600" oninput="updateSlotModel()" class="w-20 text-right bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-condensed font-medium focus:border-[#009fe3] focus:outline-none">
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-300">Тариф за слот:</span>
+            <input type="number" id="slot_p5" value="2000" oninput="updateSlotModel()" class="w-24 text-right bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sky-400 font-condensed font-medium focus:border-[#009fe3] focus:outline-none">
+          </div>
+          <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between">
+            <span class="text-slate-400">Чистая выручка (95%):</span>
+            <span id="slot_net5" class="font-condensed font-medium text-sky-400 text-sm">1 140 000 ₽</span>
+          </div>
+        </div>
+
+        <!-- 10 км -->
+        <div class="bg-white/5 rounded-xl p-4 border border-slate-700/60 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-condensed font-semibold text-indigo-400 text-sm">10 КМ • ЛЮБИТЕЛИ</span>
+            <span class="text-[11px] text-slate-400">от 18 лет</span>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-300">Слотов:</span>
+            <input type="number" id="slot_q10" value="600" oninput="updateSlotModel()" class="w-20 text-right bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-condensed font-medium focus:border-[#009fe3] focus:outline-none">
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-300">Тариф за слот:</span>
+            <input type="number" id="slot_p10" value="2500" oninput="updateSlotModel()" class="w-24 text-right bg-slate-900 border border-slate-700 rounded px-2 py-1 text-indigo-400 font-condensed font-medium focus:border-[#009fe3] focus:outline-none">
+          </div>
+          <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between">
+            <span class="text-slate-400">Чистая выручка (95%):</span>
+            <span id="slot_net10" class="font-condensed font-medium text-indigo-400 text-sm">1 425 000 ₽</span>
+          </div>
+        </div>
+
+        <!-- 21.1 км -->
+        <div class="bg-white/5 rounded-xl p-4 border border-slate-700/60 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-condensed font-semibold text-[#ff3311] text-sm">21.1 КМ • ПОЛУМАРАФОН</span>
+            <span class="text-[11px] text-slate-400">от 18 лет</span>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-300">Слотов:</span>
+            <input type="number" id="slot_q21" value="400" oninput="updateSlotModel()" class="w-20 text-right bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white font-condensed font-medium focus:border-[#009fe3] focus:outline-none">
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-300">Тариф за слот:</span>
+            <input type="number" id="slot_p21" value="3500" oninput="updateSlotModel()" class="w-24 text-right bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[#ff3311] font-condensed font-medium focus:border-[#009fe3] focus:outline-none">
+          </div>
+          <div class="pt-2 border-t border-slate-700/60 flex items-center justify-between">
+            <span class="text-slate-400">Чистая выручка (95%):</span>
+            <span id="slot_net21" class="font-condensed font-medium text-[#ff3311] text-sm">1 330 000 ₽</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ИТОГИ САМООКУПАЕМОСТИ -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-slate-700 text-center">
+        <div class="p-2.5 bg-white/5 rounded-lg">
+          <span class="text-[11px] text-slate-400 block">Всего участников:</span>
+          <span id="slots_total_runners" class="text-lg font-medium font-condensed text-white">2 000 чел.</span>
+        </div>
+        <div class="p-2.5 bg-white/5 rounded-lg">
+          <span class="text-[11px] text-slate-400 block">Валовая выручка:</span>
+          <span id="slots_total_gross" class="text-lg font-medium font-condensed text-white">4 700 000 ₽</span>
+        </div>
+        <div class="p-2.5 bg-white/5 rounded-lg border border-emerald-500/30">
+          <span class="text-[11px] text-emerald-300 block">Чистая выручка КГАУ «ЦСП ПК» (95%):</span>
+          <span id="slots_total_net" class="text-lg font-medium font-condensed text-emerald-400">4 465 000 ₽</span>
+        </div>
+        <div class="p-2.5 bg-white/5 rounded-lg border border-sky-500/30">
+          <span class="text-[11px] text-sky-300 block">Чистый профицит к смете:</span>
+          <span id="slots_surplus" class="text-lg font-medium font-condensed text-sky-400">+1 593 105 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ПАНЕЛЬ СЦЕНАРИЕВ СМЕТЫ И КНОПКИ ДЕЙСТВИЙ -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 no-print">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs font-condensed font-semibold text-slate-500 uppercase mr-1">Сценарии расходов:</span>
+        <button onclick="setScenario('minsport_2000')" id="btn_minsport_2000" class="px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-[#009fe3] text-white shadow transition">
+          Оптимальный (2 000 чел. • 2,87M)
+        </button>
+        <button onclick="setScenario('minsport_1200')" id="btn_minsport_1200" class="px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 transition">
+          Целевой (1 200 чел. • 2,38M)
+        </button>
+        <button onclick="setScenario('agranat')" id="btn_agranat" class="px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 transition">
+          Агранат (5,01M)
+        </button>
+        <button onclick="setScenario('econom')" id="btn_econom" class="px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 transition">
+          Эконом-минимум (1,69M)
+        </button>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="addCustomRow()" class="px-3 py-1.5 rounded-lg bg-[#009fe3] hover:bg-[#007bb5] text-white text-xs font-condensed font-medium flex items-center gap-1 transition shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          <span>Добавить статью расходов</span>
+        </button>
+        <button onclick="saveEstimatorManual()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-condensed font-medium flex items-center gap-1 transition shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          <span>Сохранить правки</span>
+        </button>
+        <button onclick="resetDefaults()" class="px-3 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-600 text-xs font-condensed font-medium transition">
+          Сброс к исходным
+        </button>
+      </div>
+    </div>
+
+    <!-- ТАБЛИЦА СМЕТЫ -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden print-shadow-none">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead>
+            <tr class="bg-[#091a2b] text-white font-condensed font-medium text-[11px] uppercase tracking-wider">
+              <th class="p-3 w-10 text-center">№</th>
+              <th class="p-3 min-w-[220px]">Наименование статьи расходов</th>
+              <th class="p-3 text-center w-16">Ед. изм.</th>
+              <th class="p-3 text-right w-24">Баз. кол-во</th>
+              <th class="p-3 text-right w-28">Баз. цена, ₽</th>
+              <th class="p-3 text-right w-28 bg-[#0077b6] text-white font-semibold">Ваше кол-во</th>
+              <th class="p-3 text-right w-32 bg-[#0077b6] text-white font-semibold">Ваша цена, ₽</th>
+              <th class="p-3 text-right w-32 bg-[#009fe3] text-white font-bold">Итого, ₽</th>
+              <th class="p-3 text-right w-28">Агранат, ₽</th>
+              <th class="p-3 text-right w-28 text-emerald-300">Экономия, ₽</th>
+              <th class="p-3 min-w-[180px]">Поставщик / Обоснование</th>
+              <th class="p-3 w-12 text-center no-print text-rose-300">Удал.</th>
+            </tr>
+          </thead>
+          <tbody id="budgetTableBody" class="divide-y divide-slate-100 text-slate-800">
+            <!-- Строки генерируются JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- БЛОК СКАЧИВАНИЯ ДОКУМЕНТОВ -->
+    <div class="bg-gradient-to-r from-slate-900 to-[#091a2b] rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row items-center justify-between gap-6 no-print">
+      <div class="space-y-1">
+        <span class="text-xs font-condensed font-medium text-[#009fe3] tracking-widest uppercase block">ОФИЦИАЛЬНЫЙ ПАКЕТ ФАЙЛОВ ДЛЯ МИНСПОРТА И КАЗНАЧЕЙСТВА</span>
+        <h3 class="text-lg font-medium font-condensed uppercase tracking-tight text-white">Все сметы и обоснования подготовлены в форматах Excel (.xlsx)</h3>
+        <p class="text-xs text-slate-400 font-light max-w-2xl">
+          Сметы содержат реальные коммерческие предложения, обоснования расценок по 44-ФЗ и расчет экономической выгоды для Камчатского края.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <a href="01_Сводная_смета_ЗаБегРФ_2027_Сравнение_и_Альтернатива.xlsx" download class="px-4 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-condensed font-semibold text-xs flex items-center gap-2 shadow transition">
+          <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          <span>01_Сводная_смета.xlsx</span>
+        </a>
+        <a href="02_Шаблон_сметы_для_расчета_и_изменения_цен.xlsx" download class="px-4 py-2.5 rounded-xl bg-[#009fe3] hover:bg-[#007bb5] text-white font-condensed font-semibold text-xs flex items-center gap-2 shadow transition">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          <span>02_Шаблон_сметы.xlsx</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ФУТЕР -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 font-light no-print">
+    Всероссийский полумарафон «ЗаБег.РФ» • Петропавловск-Камчатский • 22 мая 2027 г. • Министерство спорта Камчатского края
+  </footer>
+
+  <!-- СЦЕНАРИИ И ЛОГИКА КАЛЬКУЛЯТОРА JS -->
+  <script>
+    const INITIAL_DATA = [
+      // РАЗДЕЛ 1. ТРУД И СУДЕЙСТВО
+      { id: 1, sec: 1, secName: "1. Труд, судейство и волонтеры", name: "Главная судейская коллегия (ГСК)", unit: "чел.", baseQty: 12, basePrice: 17500, agranat: 280000, source: "Федерация легкой атлетики Камчатского края (1-я и всерос. кат.)" },
+      { id: 2, sec: 1, secName: "1. Труд, судейство и волонтеры", name: "Судьи на дистанциях, хронометраже и разворотах", unit: "чел.", baseQty: 24, basePrice: 7000, agranat: 240000, source: "Тренеры-преподаватели ДЮСШ и СШОР ПКГО" },
+      { id: 3, sec: 1, secName: "1. Труд, судейство и волонтеры", name: "Координаторы волонтерского корпуса и регистрации", unit: "чел.", baseQty: 6, basePrice: 8000, agranat: 90000, source: "КГАУ «Дворец молодежи» / Волонтеры Камчатки" },
+      { id: 4, sec: 1, secName: "1. Труд, судейство и волонтеры", name: "Питание, вода и экипировка судей и волонтеров", unit: "компл.", baseQty: 150, basePrice: 800, agranat: 185000, source: "Камчатский комбинат питания / Бартер ланч-боксы" },
+      { id: 5, sec: 1, secName: "1. Труд, судейство и волонтеры", name: "Технический и комендантский персонал стадиона", unit: "чел.", baseQty: 8, basePrice: 8000, agranat: 120000, source: "КГАУ «ЦСП ПК» (стадион «Спартак») в рамках окладов" },
+
+      // РАЗДЕЛ 2. ТРАССА И БЕЗОПАСНОСТЬ
+      { id: 6, sec: 2, secName: "2. Трасса, безопасность и ограждения", name: "Аренда барьеров ограждения фан-барьер", unit: "пог. м", baseQty: 800, basePrice: 237.5, agranat: 380000, source: "МУП «Спецдорремстрой» ПКГО — доставка и расстановка" },
+      { id: 7, sec: 2, secName: "2. Трасса, безопасность и ограждения", name: "Тяжелая техника прикрытия перекрестков (КАМАЗ/КДМ)", unit: "маш.-смена", baseQty: 14, basePrice: 0, agranat: 320000, source: "Администрация ПКГО (МУП) — безвозмездно по регламенту МВД" },
+      { id: 8, sec: 2, secName: "2. Трасса, безопасность и ограждения", name: "Дорожные знаки, водоналивные блоки, конусы", unit: "компл.", baseQty: 1, basePrice: 75000, agranat: 140000, source: "Служба автомобильных дорог ПКГО — инвентарь муниципалитета" },
+      { id: 9, sec: 2, secName: "2. Трасса, безопасность и ограждения", name: "Дежурство скорой помощи и реанимации (3 бригады)", unit: "бригада", baseQty: 3, basePrice: 0, agranat: 210000, source: "Минздрав Камчатского края — распоряжение Правительства края" },
+      { id: 10, sec: 2, secName: "2. Трасса, безопасность и ограждения", name: "Охрана ЧОП и рамки металлодетекторов", unit: "пост", baseQty: 10, basePrice: 14000, agranat: 260000, source: "ЧОП «Камчатский щит» — контрольно-пропускной режим" },
+      { id: 11, sec: 2, secName: "2. Трасса, безопасность и ограждения", name: "Механизированная уборка и клининг трассы", unit: "услуга", baseQty: 1, basePrice: 65000, agranat: 160000, source: "МУП «Благоустройство ПКГО» — до и после забега" },
+
+      // РАЗДЕЛ 3. СЦЕНА, ЗВУК, ЭКРАНЫ
+      { id: 12, sec: 3, secName: "3. Сцена, звук, экраны и фан-зона", name: "Аренда главной сцены 10×8 м с порталами", unit: "компл.", baseQty: 1, basePrice: 240000, agranat: 390000, source: "КГАУ «Камчатское концертно-филармоническое объед.»" },
+      { id: 13, sec: 3, secName: "3. Сцена, звук, экраны и фан-зона", name: "Светодиодный экран 6×4 м (Р10 уличный)", unit: "компл.", baseQty: 1, basePrice: 210000, agranat: 350000, source: "ООО «КамчатМедиаСервис» — прямая аренда оборудования" },
+      { id: 14, sec: 3, secName: "3. Сцена, звук, экраны и фан-зона", name: "Звуковой комплекс 25 кВт, бэклайн, радиосистемы", unit: "компл.", baseQty: 1, basePrice: 160000, agranat: 270000, source: "Камчатский театр драмы и комедии — звукоусиление" },
+      { id: 15, sec: 3, secName: "3. Сцена, звук, экраны и фан-зона", name: "Ведущие мероприятия, диджей, звукорежиссер", unit: "смена", baseQty: 1, basePrice: 110000, agranat: 190000, source: "Профессиональные спортивные дикторы Камчатки" },
+      { id: 16, sec: 3, secName: "3. Сцена, звук, экраны и фан-зона", name: "Выступление творческих коллективов Камчатки", unit: "программа", baseQty: 1, basePrice: 90000, agranat: 180000, source: "Камчатские вокальные и хореографические коллективы (без оркестра и барабанов)" },
+      { id: 17, sec: 3, secName: "3. Сцена, звук, экраны и фан-зона", name: "Генераторное автономное электроснабжение 60 кВт", unit: "компл.", baseQty: 1, basePrice: 85000, agranat: 170000, source: "ПАО «Камчатскэнерго» (резервный дизель-генератор)" },
+
+      // РАЗДЕЛ 4. ЭКСПО И ЛОГИСТИКА
+      { id: 18, sec: 4, secName: "4. Экспо, кейтеринг и логистика", name: "Аренда павильонов и шатров Экспо (5×5 м)", unit: "шт.", baseQty: 6, basePrice: 27500, agranat: 290000, source: "ООО «Камтент» — выдача номеров в ФОК «Звёздный», штаб" },
+      { id: 19, sec: 4, secName: "4. Экспо, кейтеринг и логистика", name: "Мобильные туалетные кабины с обслуживанием", unit: "шт.", baseQty: 20, basePrice: 4750, agranat: 175000, source: "МУП «ЭкоТранс ПК» — доставка, откачка, дезинфекция" },
+      { id: 20, sec: 4, secName: "4. Экспо, кейтеринг и логистика", name: "Пункты гидратации: бутилированная вода 0.5л", unit: "бутылок", baseQty: 5000, basePrice: 0, agranat: 150000, source: "Партнер ЗАО «Малкинское» — 100% бартерное спонсорство" },
+      { id: 21, sec: 4, secName: "4. Экспо, кейтеринг и логистика", name: "Полевая кухня: камчатская уха для участников", unit: "порций", baseQty: 2000, basePrice: 0, agranat: 220000, source: "Генеральный партнер АО «Океанрыбфлот»" },
+      { id: 22, sec: 4, secName: "4. Экспо, кейтеринг и логистика", name: "Складская мебель, столы регистрации, стулья", unit: "компл.", baseQty: 80, basePrice: 625, agranat: 110000, source: "Складской фонд КГАУ «ЦСП ПК» — инвентарь спорта" },
+      { id: 23, sec: 4, secName: "4. Экспо, кейтеринг и логистика", name: "Грузовая логистика, доставка барьеров и шатров", unit: "рейс", baseQty: 15, basePrice: 4800, agranat: 135000, source: "Транспортный цех учреждений Минспорта" },
+
+      // РАЗДЕЛ 5. ХРОНОМЕТРАЖ И ТРАНСЛЯЦИЯ
+      { id: 24, sec: 5, secName: "5. Хронометраж, трансляция и реклама", name: "Электронный чиповый хронометраж (2000 чел.)", unit: "участник", baseQty: 2000, basePrice: 130, agranat: 420048, source: "Официальный тайминг-оператор ЗаБег.РФ — дублирующий створ" },
+      { id: 25, sec: 5, secName: "5. Хронометраж, трансляция и реклама", name: "ПТС и телемост с Москвой («Матч ТВ»)", unit: "смена", baseQty: 1, basePrice: 220000, agranat: 380000, source: "ГТРК «Камчатка» / Медиа-Центр — прямой телемост" },
+      { id: 26, sec: 5, secName: "5. Хронометраж, трансляция и реклама", name: "Спутниковый канал связи и резервный интернет", unit: "канал", baseQty: 1, basePrice: 85000, agranat: 160000, source: "ПАО «Ростелеком» — оптический канал 1 Гбит/с" },
+      { id: 27, sec: 5, secName: "5. Хронометраж, трансляция и реклама", name: "Фотостена героев с фамилиями участников (12×3 м)", unit: "шт.", baseQty: 1, basePrice: 78000, agranat: 140000, source: "Типография «КамчатПресс» — вирусный охват 150K" },
+      { id: 28, sec: 5, secName: "5. Хронометраж, трансляция и реклама", name: "Стартово-финишная арка и брендинг стадиона", unit: "компл.", baseQty: 1, basePrice: 71300, agranat: 130000, source: "РПК «КамАрт» — брендинг ПАО «ПСБ» и ЗаБег.РФ" },
+      { id: 29, sec: 5, secName: "5. Хронометраж, трансляция и реклама", name: "Операторская группа (4 камеры, дрон 4K)", unit: "смена", baseQty: 1, basePrice: 125000, agranat: 210000, source: "Студия «Камвидео» — видовые планы на фоне вулканов" }
+    ];
+
+    function loadEstimatorBudget() {
+      try {
+        const saved = localStorage.getItem('zabeg2027_estimator_budget');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.error('Ошибка загрузки сметы из localStorage', e);
+      }
+      const initial = JSON.parse(JSON.stringify(INITIAL_DATA));
+      initial.forEach(item => {
+        item.userQty = item.baseQty;
+        item.userPrice = item.basePrice;
+      });
+      return initial;
+    }
+
+    let itemsData = loadEstimatorBudget();
+
+    function saveEstimatorBudget() {
+      try {
+        localStorage.setItem('zabeg2027_estimator_budget', JSON.stringify(itemsData));
+        showSaveBadge('Сохранено в браузере');
+      } catch (e) {
+        console.error('Ошибка сохранения в localStorage', e);
+      }
+    }
+
+    function showSaveBadge(msg) {
+      const el = document.getElementById('save_badge');
+      if (el) {
+        el.innerHTML = `<svg class="w-3.5 h-3.5 text-emerald-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> ${msg}`;
+        clearTimeout(window._badgeTimer);
+        window._badgeTimer = setTimeout(() => {
+          el.innerHTML = `<svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> LocalStorage активно`;
+        }, 2000);
+      }
+    }
+
+    function formatRub(num) {
+      return Math.round(num).toLocaleString('ru-RU') + ' ₽';
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('budgetTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let lastSec = 0;
+
+      itemsData.forEach((item, idx) => {
+        if (item.sec !== lastSec && item.secName) {
+          lastSec = item.sec;
+          const secRow = document.createElement('tr');
+          secRow.className = 'bg-slate-100/90 text-slate-800 font-medium font-condensed uppercase tracking-wider text-[11px]';
+          secRow.innerHTML = `<td colspan="12" class="p-2.5 pl-3 border-y border-slate-200 text-[#007bb5]">${item.secName}</td>`;
+          tbody.appendChild(secRow);
+        }
+
+        const totalUser = (item.userQty || 0) * (item.userPrice || 0);
+        const agrTotal = item.agranat || 0;
+        const savings = agrTotal - totalUser;
+        const isCustom = !item.baseQty && item.baseQty !== 0;
+
+        const tr = document.createElement('tr');
+        tr.className = `hover:bg-slate-50/80 transition-colors border-b border-slate-100 ${isCustom ? 'bg-amber-50/20' : ''}`;
+        
+        tr.innerHTML = `
+          <td class="p-2.5 text-center text-slate-400 font-condensed">${item.id}</td>
+          <td class="p-2.5 font-normal text-slate-800">
+            <div contenteditable="true" onblur="updateItemTitle(${idx}, this.innerText.trim())" 
+              class="outline-none hover:bg-slate-100 focus:bg-white rounded px-1 transition text-slate-800 cursor-text" title="Кликните для редактирования">
+              ${item.name}
+            </div>
+          </td>
+          <td class="p-2.5 text-center text-slate-500 font-condensed">${item.unit || 'усл.'}</td>
+          <td class="p-2.5 text-right text-slate-500 font-condensed">${item.baseQty !== undefined ? item.baseQty : '-'}</td>
+          <td class="p-2.5 text-right text-slate-500 font-condensed">${item.basePrice !== undefined ? formatRub(item.basePrice) : '-'}</td>
+          <td class="p-1.5 text-right w-24">
+            <input type="number" step="any" min="0" value="${item.userQty}" 
+              oninput="updateUserVal(${idx}, 'userQty', this.value)" 
+              class="table-input">
+          </td>
+          <td class="p-1.5 text-right w-28">
+            <input type="number" step="any" min="0" value="${item.userPrice}" 
+              oninput="updateUserVal(${idx}, 'userPrice', this.value)" 
+              class="table-input">
+          </td>
+          <td class="p-2.5 text-right font-medium font-condensed text-slate-900 bg-slate-50/50" id="row_tot_${idx}">
+            ${formatRub(totalUser)}
+          </td>
+          <td class="p-2.5 text-right text-slate-500 font-condensed">${formatRub(agrTotal)}</td>
+          <td class="p-2.5 text-right font-condensed font-medium ${savings >= 0 ? 'text-emerald-700' : 'text-rose-700'}" id="row_sav_${idx}">
+            ${savings >= 0 ? '-' + formatRub(savings) : '+' + formatRub(Math.abs(savings))}
+          </td>
+          <td class="p-2.5 text-[11px] text-slate-600 max-w-xs truncate" title="${item.source || ''}">
+            ${item.source || 'Прямой договор'}
+          </td>
+          <td class="p-2.5 text-center no-print">
+            <button onclick="deleteRow(${idx})" class="p-1 text-slate-400 hover:text-rose-600 transition" title="Удалить строку">
+              <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      calculateTotals();
+    }
+
+    function updateUserVal(idx, key, val) {
+      const num = parseFloat(val) || 0;
+      itemsData[idx][key] = num;
+
+      const totalUser = (itemsData[idx].userQty || 0) * (itemsData[idx].userPrice || 0);
+      const agrTotal = itemsData[idx].agranat || 0;
+      const savings = agrTotal - totalUser;
+
+      const totEl = document.getElementById(`row_tot_${idx}`);
+      if (totEl) totEl.innerText = formatRub(totalUser);
+
+      const savEl = document.getElementById(`row_sav_${idx}`);
+      if (savEl) {
+        savEl.innerText = savings >= 0 ? '-' + formatRub(savings) : '+' + formatRub(Math.abs(savings));
+        savEl.className = `p-2.5 text-right font-condensed font-medium ${savings >= 0 ? 'text-emerald-700' : 'text-rose-700'}`;
+      }
+
+      saveEstimatorBudget();
+      calculateTotals();
+    }
+
+    function updateItemTitle(idx, text) {
+      if (itemsData[idx]) {
+        itemsData[idx].name = text;
+        saveEstimatorBudget();
+      }
+    }
+
+    function addCustomRow() {
+      const maxId = itemsData.length > 0 ? Math.max(...itemsData.map(i => i.id || 0)) : 0;
+      const newId = maxId + 1;
+      const newRow = {
+        id: newId,
+        sec: 4,
+        secName: "4. Экспо, кейтеринг и логистика",
+        name: "Новая статья расходов (кликните для изменения)",
+        unit: "компл.",
+        baseQty: 1,
+        basePrice: 15000,
+        userQty: 1,
+        userPrice: 15000,
+        agranat: 25000,
+        source: "Прямой договор / Региональный поставщик"
+      };
+
+      itemsData.push(newRow);
+      saveEstimatorBudget();
+      renderTable();
+      showSaveBadge(`Строка № ${newId} добавлена`);
+    }
+
+    function deleteRow(idx) {
+      if (confirm(`Удалить строку № ${itemsData[idx].id} («${itemsData[idx].name}»)?`)) {
+        itemsData.splice(idx, 1);
+        saveEstimatorBudget();
+        renderTable();
+        showSaveBadge('Строка удалена');
+      }
+    }
+
+    function saveEstimatorManual() {
+      saveEstimatorBudget();
+      alert('Смета успешно сохранена в браузере (LocalStorage)! Ваши параметры останутся неизменными при закрытии страницы.');
+    }
+
+    function calculateTotals() {
+      let directSum = 0;
+      let agranatSum = 0;
+
+      itemsData.forEach(item => {
+        directSum += (item.userQty || 0) * (item.userPrice || 0);
+        agranatSum += (item.agranat || 0);
+      });
+
+      const reserve15 = Math.round(directSum * 0.15);
+      const totalWithRes = directSum + reserve15;
+      const savings = agranatSum - totalWithRes;
+      const savingsPct = agranatSum > 0 ? ((savings / agranatSum) * 100).toFixed(1) : "0.0";
+
+      document.getElementById('kpiDirect').innerText = formatRub(directSum);
+      document.getElementById('kpiReserve').innerText = formatRub(reserve15);
+      document.getElementById('kpiTotalWithRes').innerText = formatRub(totalWithRes);
+      document.getElementById('kpiAgranat').innerText = formatRub(agranatSum);
+      document.getElementById('kpiSavings').innerText = (savings >= 0 ? '' : '+') + formatRub(savings);
+      document.getElementById('kpiSavingsPct').innerText = `${savingsPct}% экономии бюджета`;
+
+      updateSlotModel();
+    }
+
+    function setScenario(scen) {
+      ['btn_minsport_2000', 'btn_minsport_1200', 'btn_agranat', 'btn_econom'].forEach(b => {
+        const el = document.getElementById(b);
+        if (el) el.className = 'px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-slate-100 hover:bg-slate-200 text-slate-800 transition';
+      });
+      const activeBtn = document.getElementById(`btn_${scen}`);
+      if (activeBtn) activeBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-[#009fe3] text-white shadow transition';
+
+      if (scen === 'minsport_2000') {
+        itemsData = JSON.parse(JSON.stringify(INITIAL_DATA));
+        itemsData.forEach(item => {
+          item.userQty = item.baseQty;
+          item.userPrice = item.basePrice;
+        });
+      } else if (scen === 'minsport_1200') {
+        itemsData = JSON.parse(JSON.stringify(INITIAL_DATA));
+        itemsData.forEach(item => {
+          if (item.id === 4) item.userQty = 100;
+          if (item.id === 24) item.userQty = 1200;
+          item.userPrice = item.basePrice;
+        });
+      } else if (scen === 'agranat') {
+        itemsData = JSON.parse(JSON.stringify(INITIAL_DATA));
+        itemsData.forEach(item => {
+          item.userQty = 1;
+          item.userPrice = item.agranat;
+        });
+      } else if (scen === 'econom') {
+        itemsData = JSON.parse(JSON.stringify(INITIAL_DATA));
+        itemsData.forEach(item => {
+          item.userQty = Math.round(item.baseQty * 0.85) || 1;
+          item.userPrice = Math.round(item.basePrice * 0.75);
+        });
+      }
+
+      saveEstimatorBudget();
+      renderTable();
+    }
+
+    function resetDefaults() {
+      if (confirm('Сбросить все правки к базовой смете Минспорта на 2 000 человек?')) {
+        localStorage.removeItem('zabeg2027_estimator_budget');
+        localStorage.removeItem('zabeg2027_estimator_slots');
+        setScenario('minsport_2000');
+        setSlotTariffPreset('start');
+        showSaveBadge('Сброшено к базовой');
+      }
+    }
+
+    // ЛОГИКА СЛОТОВ
+    function setSlotTariffPreset(preset) {
+      ['btn_slot_start', 'btn_slot_mid', 'btn_slot_final'].forEach(b => {
+        const el = document.getElementById(b);
+        if (el) el.className = 'px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition';
+      });
+      const act = document.getElementById(`btn_slot_${preset}`);
+      if (act) act.className = 'px-3 py-1.5 rounded-lg text-xs font-condensed font-medium bg-[#009fe3] text-white shadow transition';
+
+      if (preset === 'start') {
+        document.getElementById('slot_p1').value = 1500;
+        document.getElementById('slot_p5').value = 2000;
+        document.getElementById('slot_p10').value = 2500;
+        document.getElementById('slot_p21').value = 3500;
+      } else if (preset === 'mid') {
+        document.getElementById('slot_p1').value = 1750;
+        document.getElementById('slot_p5').value = 2250;
+        document.getElementById('slot_p10').value = 2750;
+        document.getElementById('slot_p21').value = 3750;
+      } else if (preset === 'final') {
+        document.getElementById('slot_p1').value = 2000;
+        document.getElementById('slot_p5').value = 2500;
+        document.getElementById('slot_p10').value = 3000;
+        document.getElementById('slot_p21').value = 4000;
+      }
+      updateSlotModel();
+    }
+
+    function updateSlotModel() {
+      const q1 = parseFloat(document.getElementById('slot_q1')?.value) || 0;
+      const p1 = parseFloat(document.getElementById('slot_p1')?.value) || 0;
+      const g1 = q1 * p1;
+      const n1 = Math.round(g1 * 0.95);
+      if (document.getElementById('slot_net1')) document.getElementById('slot_net1').innerText = formatRub(n1);
+
+      const q5 = parseFloat(document.getElementById('slot_q5')?.value) || 0;
+      const p5 = parseFloat(document.getElementById('slot_p5')?.value) || 0;
+      const g5 = q5 * p5;
+      const n5 = Math.round(g5 * 0.95);
+      if (document.getElementById('slot_net5')) document.getElementById('slot_net5').innerText = formatRub(n5);
+
+      const q10 = parseFloat(document.getElementById('slot_q10')?.value) || 0;
+      const p10 = parseFloat(document.getElementById('slot_p10')?.value) || 0;
+      const g10 = q10 * p10;
+      const n10 = Math.round(g10 * 0.95);
+      if (document.getElementById('slot_net10')) document.getElementById('slot_net10').innerText = formatRub(n10);
+
+      const q21 = parseFloat(document.getElementById('slot_q21')?.value) || 0;
+      const p21 = parseFloat(document.getElementById('slot_p21')?.value) || 0;
+      const g21 = q21 * p21;
+      const n21 = Math.round(g21 * 0.95);
+      if (document.getElementById('slot_net21')) document.getElementById('slot_net21').innerText = formatRub(n21);
+
+      const totR = q1 + q5 + q10 + q21;
+      const totG = g1 + g5 + g10 + g21;
+      const totN = n1 + n5 + n10 + n21;
+
+      if (document.getElementById('slots_total_runners')) document.getElementById('slots_total_runners').innerText = totR.toLocaleString('ru-RU') + ' чел.';
+      if (document.getElementById('slots_total_gross')) document.getElementById('slots_total_gross').innerText = formatRub(totG);
+      if (document.getElementById('slots_total_net')) document.getElementById('slots_total_net').innerText = formatRub(totN);
+
+      // Рассчитываем профицит к смете
+      let curDirect = 0;
+      itemsData.forEach(it => { curDirect += (it.userQty || 0) * (it.userPrice || 0); });
+      const curTotalWithRes = curDirect + Math.round(curDirect * 0.15);
+      const surplus = totN - curTotalWithRes;
+
+      const elSurplus = document.getElementById('slots_surplus');
+      if (elSurplus) {
+        elSurplus.innerText = (surplus >= 0 ? '+' : '') + formatRub(surplus);
+        elSurplus.className = surplus >= 0 ? "text-lg font-medium font-condensed text-sky-400" : "text-lg font-medium font-condensed text-rose-400";
+      }
+
+      // Save slots to storage
+      try {
+        localStorage.setItem('zabeg2027_estimator_slots', JSON.stringify({ q1, p1, q5, p5, q10, p10, q21, p21 }));
+      } catch (e) {}
+    }
+
+    function loadSavedSlots() {
+      try {
+        const saved = localStorage.getItem('zabeg2027_estimator_slots');
+        if (saved) {
+          const s = JSON.parse(saved);
+          if (s.q1 !== undefined) document.getElementById('slot_q1').value = s.q1;
+          if (s.p1 !== undefined) document.getElementById('slot_p1').value = s.p1;
+          if (s.q5 !== undefined) document.getElementById('slot_q5').value = s.q5;
+          if (s.p5 !== undefined) document.getElementById('slot_p5').value = s.p5;
+          if (s.q10 !== undefined) document.getElementById('slot_q10').value = s.q10;
+          if (s.p10 !== undefined) document.getElementById('slot_p10').value = s.p10;
+          if (s.q21 !== undefined) document.getElementById('slot_q21').value = s.q21;
+          if (s.p21 !== undefined) document.getElementById('slot_p21').value = s.p21;
+        }
+      } catch (e) {}
+    }
+
+    function downloadExcelFile() {
+      if (typeof XLSX === 'undefined') {
+        alert('Библиотека Excel загружается, повторите попытку через секунду...');
+        return;
+      }
+
+      const rowsBudget = [
+        ["№", "Раздел сметы", "Наименование статьи расходов", "Ед. изм.", "Базовое кол-во", "Базовая цена, ₽", "Ваше кол-во", "Ваша цена, ₽", "Итого по вашей цене, ₽", "Смета Агранат, ₽", "Экономия, ₽", "Поставщик / Обоснование"]
+      ];
+
+      let totalDirect = 0;
+      let totalAgranat = 0;
+
+      itemsData.forEach(item => {
+        const itemTot = (item.userQty || 0) * (item.userPrice || 0);
+        const itemSav = (item.agranat || 0) - itemTot;
+        totalDirect += itemTot;
+        totalAgranat += (item.agranat || 0);
+
+        rowsBudget.push([
+          item.id,
+          item.secName,
+          item.name,
+          item.unit,
+          item.baseQty,
+          item.basePrice,
+          item.userQty,
+          item.userPrice,
+          itemTot,
+          item.agranat,
+          itemSav,
+          item.source
+        ]);
+      });
+
+      const res15 = Math.round(totalDirect * 0.15);
+      const totalBudget = totalDirect + res15;
+      const totalSavings = totalAgranat - totalBudget;
+
+      rowsBudget.push([]);
+      rowsBudget.push(["", "", "ПРЯМЫЕ РАСХОДЫ ИТОГО", "", "", "", "", "", totalDirect, totalAgranat, totalAgranat - totalDirect, "Сумма статей"]);
+      rowsBudget.push(["", "", "НЕПРЕДВИДЕННЫЙ И ПОГОДНЫЙ РЕЗЕРВ (15%)", "", "", "", "", "", res15, 0, -res15, "Резерв на форс-мажор"]);
+      rowsBudget.push(["", "", "ЦЕЛЕВОЙ БЮДЖЕТ С РЕЗЕРВОМ 15% (ИТОГО)", "", "", "", "", "", totalBudget, totalAgranat, totalSavings, "ИТОГОВЫЙ ОРИЕНТИР"]);
+      rowsBudget.push(["", "", "ЧИСТАЯ ЭКОНОМИЯ БЮДЖЕТА КРАЯ", "", "", "", "", "", totalSavings, "", ((totalSavings/totalAgranat)*100).toFixed(1) + "%", "Прямое сбережение средств"]);
+
+      const wb = XLSX.utils.book_new();
+      const wsBudget = XLSX.utils.aoa_to_sheet(rowsBudget);
+      XLSX.utils.book_append_sheet(wb, wsBudget, "Смета 29 статей");
+
+      // Лист 2: Выручка от слотов
+      const q1 = parseFloat(document.getElementById('slot_q1')?.value) || 0;
+      const p1 = parseFloat(document.getElementById('slot_p1')?.value) || 0;
+      const q5 = parseFloat(document.getElementById('slot_q5')?.value) || 0;
+      const p5 = parseFloat(document.getElementById('slot_p5')?.value) || 0;
+      const q10 = parseFloat(document.getElementById('slot_q10')?.value) || 0;
+      const p10 = parseFloat(document.getElementById('slot_p10')?.value) || 0;
+      const q21 = parseFloat(document.getElementById('slot_q21')?.value) || 0;
+      const p21 = parseFloat(document.getElementById('slot_p21')?.value) || 0;
+
+      const rowsSlots = [
+        ["Дистанция", "Количество слотов", "Тариф за слот, ₽", "Валовая выручка, ₽", "Эквайринг 5%, ₽", "Чистая выручка (95%), ₽"],
+        ["1 км (Детский)", q1, p1, q1*p1, Math.round(q1*p1*0.05), Math.round(q1*p1*0.95)],
+        ["ПСБ 5 км (Новички)", q5, p5, q5*p5, Math.round(q5*p5*0.05), Math.round(q5*p5*0.95)],
+        ["10 км (Любители)", q10, p10, q10*p10, Math.round(q10*p10*0.05), Math.round(q10*p10*0.95)],
+        ["21.1 км (Полумарафон)", q21, p21, q21*p21, Math.round(q21*p21*0.05), Math.round(q21*p21*0.95)],
+        [],
+        ["ИТОГО ВЫРУЧКА", q1+q5+q10+q21, "", (q1*p1+q5*p5+q10*p10+q21*p21), Math.round((q1*p1+q5*p5+q10*p10+q21*p21)*0.05), Math.round((q1*p1+q5*p5+q10*p10+q21*p21)*0.95)],
+        ["ЦЕЛЕВОЙ БЮДЖЕТ (ИТОГО)", "", "", totalBudget, "", ""],
+        ["ЧИСТЫЙ ПРОФИЦИТ КРАЯ", "", "", Math.round((q1*p1+q5*p5+q10*p10+q21*p21)*0.95) - totalBudget, "", "100% самоокупаемость"]
+      ];
+
+      const wsSlots = XLSX.utils.aoa_to_sheet(rowsSlots);
+      XLSX.utils.book_append_sheet(wb, wsSlots, "Выручка от слотов 2000");
+
+      XLSX.writeFile(wb, "Смета_и_Выручка_ЗаБегРФ_Камчатка_2027.xlsx");
+    }
+
+    // Инициализация при загрузке
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTable();
+      loadSavedSlots();
+      updateSlotModel();
+    });
+  </script>
+</body>
+</html>
