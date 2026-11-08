@@ -1,0 +1,97 @@
+
+    /* ФИРМЕННЫЙ СТИЛЬ ЗАБЕГ.РФ: ЦИАН, ОГНЕННО-КРАСНЫЙ, ТЕМНО-СИНИЙ, БЕЛЫЙ */
+    /* ЖЕЛТЫЙ НА ГОЛУБОМ СТРОГО ИСКЛЮЧЕН */
+    /* ТИПОГРАФИКА: ТОНКИЙ, ИЗЯЩНЫЙ И СОВРЕМЕННЫЙ ШРИФТ */
+    :root {
+      --zabeg-cyan: #1caed7;
+      --zabeg-cyan-dark: #048bb1;
+      --zabeg-cyan-deep: #232323;
+      --zabeg-red: #ff3100;
+      --zabeg-red-dark: #e03006;
+      --zabeg-navy: #232323;
+      --zabeg-navy-light: #232323;
+      --zabeg-white: #ffffff;
+    }
+    body {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+    }
+    .font-condensed {
+      font-family: 'Roboto Condensed', 'Oswald', 'Arial Narrow', sans-serif;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .hero-banner {
+      background: linear-gradient(135deg, #1caed7 0%, #009dc9 50%, #048bb1 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .ribbon-banner {
+      background: rgba(255, 255, 255, 0.15);
+      transform: rotate(-1.5deg) scale(1.04);
+      border-top: 1px dashed rgba(255, 255, 255, 0.4);
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+    }
+    .stage-card-header {
+      background-color: #ff3100;
+      color: #ffffff;
+      font-weight: 500;
+      font-family: 'Roboto Condensed', 'Oswald', sans-serif;
+      font-size: 2.1rem;
+      line-height: 1;
+      padding: 0.4rem 0.6rem;
+      text-align: center;
+      letter-spacing: 0.01em;
+    }
+    .badge-stage {
+      background-color: #ff3100;
+      color: #ffffff;
+      font-weight: 500;
+      font-family: 'Roboto Condensed', 'Oswald', sans-serif;
+      font-size: 1.05rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: 0.02em;
+    }
+    .photo-card {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+    .photo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.15);
+    }
+    .photo-overlay {
+      background: linear-gradient(to top, rgba(9, 26, 43, 0.9) 0%, rgba(9, 26, 43, 0.3) 60%, transparent 100%);
+    }
+    /* Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      inset: 0;
+      background-color: rgba(9, 26, 43, 0.92);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .lightbox-modal.active {
+      display: flex;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    @media print {
+      body { background: white !important; color: black !important; font-size: 10pt; }
+      .no-print { display: none !important; }
+      .hero-banner { background: #1caed7 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .card-box { break-inside: avoid; page-break-inside: avoid; border: 1px solid #cbd5e1 !important; }
+    }

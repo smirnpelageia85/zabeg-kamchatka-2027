@@ -1,0 +1,41 @@
+
+    body {
+      font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+      font-weight: 300;
+      color: #1e293b;
+      background-color: #f8fafc;
+    }
+    .font-condensed {
+      font-family: 'Roboto Condensed', sans-serif;
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+    .table-input {
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #065f46;
+      font-family: 'Roboto Condensed', sans-serif;
+      font-weight: 500;
+      text-align: right;
+      padding: 4px 6px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+    .table-input:focus {
+      outline: none;
+      border-color: #1caed7;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 2px rgba(0, 159, 227, 0.2);
+    }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; font-size: 10pt; }
+      .print-shadow-none { box-shadow: none !important; border: 1px solid #ccc !important; }
+    }
